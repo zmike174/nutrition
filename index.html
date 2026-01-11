@@ -317,10 +317,40 @@
             cursor: pointer;
             transition: background 0.2s;
             border: 1px solid #404040;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
         }
         
         .history-item:hover {
             background: #3a3a3a;
+        }
+        
+        .history-content {
+            flex: 1;
+        }
+        
+        .history-delete {
+            background: none;
+            border: none;
+            color: #a35705;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s;
+            font-weight: 300;
+            flex-shrink: 0;
+        }
+        
+        .history-delete:hover {
+            background: rgba(163, 87, 5, 0.1);
         }
         
         .history-name {
@@ -425,9 +455,22 @@
             { name: 'Лук репчатый сырой', cal: 41, prot: 1.4, fat: 0.2, carb: 8.2 }
         ];
 
+        let customProducts = JSON.parse(localStorage.getItem('custom_products') || '[]');
         let ingredientCount = 0;
         let activeIngredients = [];
         let history = JSON.parse(localStorage.getItem('kbju_history') || '[]');
+
+        function getAllProducts() {
+            return [...productDatabase, ...customProducts];
+        }
+
+        function saveCustomProduct(name, cal, prot, fat, carb) {
+            const existing = customProducts.find(p => p.name.toLowerCase() === name.toLowerCase());
+            if (!existing && name.trim()) {
+                customProducts.push({ name, cal, prot, fat, carb });
+                localStorage.setItem('custom_products', JSON.stringify(customProducts));
+            }
+        }
 
         function addIngredient() {
             ingredientCount++;
@@ -534,7 +577,8 @@
                 return;
             }
 
-            const matches = productDatabase.filter(p => 
+            const allProducts = getAllProducts();
+            const matches = allProducts.filter(p => 
                 p.name.toLowerCase().includes(value)
             );
 
@@ -579,6 +623,7 @@
                 const nameEl = document.getElementById(`name-${id}`);
                 if (!nameEl) return;
 
+                const name = nameEl.value.trim();
                 const weight = parseFloat(document.getElementById(`weight-${id}`).value) || 0;
                 const cal = parseFloat(document.getElementById(`cal-${id}`).value) || 0;
                 const prot = parseFloat(document.getElementById(`prot-${id}`).value) || 0;
@@ -590,6 +635,10 @@
                     totalProt += (prot * weight) / 100;
                     totalFat += (fat * weight) / 100;
                     totalCarb += (carb * weight) / 100;
+                    
+                    if (name && (cal > 0 || prot > 0 || fat > 0 || carb > 0)) {
+                        saveCustomProduct(name, cal, prot, fat, carb);
+                    }
                 }
             });
 
@@ -656,12 +705,24 @@
             document.getElementById('historySection').style.display = 'block';
             const list = document.getElementById('historyList');
             list.innerHTML = history.map((dish, index) => `
-                <div class="history-item" onclick="loadFromHistory(${index})">
-                    <div class="history-name">${dish.name}</div>
-                    <div class="history-kbju">${dish.cal} ккал · Б: ${dish.prot}г · Ж: ${dish.fat}г · У: ${dish.carb}г · ${dish.date}</div>
-                    ${dish.note ? `<div class="history-note">${dish.note}</div>` : ''}
+                <div class="history-item">
+                    <div class="history-content" onclick="loadFromHistory(${index})">
+                        <div class="history-name">${dish.name}</div>
+                        <div class="history-kbju">${dish.cal} ккал · Б: ${dish.prot}г · Ж: ${dish.fat}г · У: ${dish.carb}г · ${dish.date}</div>
+                        ${dish.note ? `<div class="history-note">${dish.note}</div>` : ''}
+                    </div>
+                    <button class="history-delete" onclick="deleteHistoryItem(${index}, event)">✕</button>
                 </div>
             `).join('');
+        }
+
+        function deleteHistoryItem(index, event) {
+            event.stopPropagation();
+            if (confirm('Удалить это блюдо из истории?')) {
+                history.splice(index, 1);
+                localStorage.setItem('kbju_history', JSON.stringify(history));
+                displayHistory();
+            }
         }
 
         function loadFromHistory(index) {
@@ -673,7 +734,7 @@
             document.getElementById('dishName').value = dish.name;
             document.getElementById('dishNote').value = dish.note || '';
             document.getElementById('result').classList.add('show');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function clearHistory() {
