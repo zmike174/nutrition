@@ -1,752 +1,216 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>КБЖУ Калькулятор</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #1a1a1a;
-            color: #e8e8e8;
-            padding: 24px 20px;
-            padding-bottom: 100px;
-            line-height: 1.5;
-        }
-        
-        .container {
-            max-width: 680px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            font-size: 32px;
-            margin-bottom: 32px;
-            color: #f5f5f5;
-            font-weight: 400;
-            letter-spacing: -0.5px;
-        }
-        
-        .ingredient {
-            background: #2d2d2d;
-            padding: 24px;
-            border-radius: 16px;
-            margin-bottom: 16px;
-            border: 1px solid transparent;
-            transition: border-color 0.2s;
-        }
-        
-        .ingredient-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            line-height: 1;
-        }
-        
-        .ingredient-number {
-            font-weight: 400;
-            color: #9b9b9b;
-            font-size: 15px;
-            line-height: 1;
-        }
-        
-        .remove-btn {
-            background: none;
-            border: none;
-            color: #a35705;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            transition: background 0.2s;
-            font-weight: 300;
-            line-height: 1;
-            margin-top: -2px;
-        }
-        
-        .remove-btn:hover {
-            background: rgba(255, 107, 107, 0.1);
-        }
-        
-        .autocomplete-wrapper {
-            position: relative;
-            margin-bottom: 16px;
-        }
-        
-        .autocomplete-list {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: #2d2d2d;
-            border: 1px solid #404040;
-            border-radius: 12px;
-            max-height: 240px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            display: none;
-        }
-        
-        .autocomplete-list.show {
-            display: block;
-        }
-        
-        .autocomplete-item {
-            padding: 16px 18px;
-            cursor: pointer;
-            color: #e8e8e8;
-            font-size: 15px;
-            transition: background 0.15s;
-        }
-        
-        .autocomplete-item:hover {
-            background: #3a3a3a;
-        }
-        
-        .autocomplete-item:first-child {
-            border-radius: 12px 12px 0 0;
-        }
-        
-        .autocomplete-item:last-child {
-            border-radius: 0 0 12px 12px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #9b9b9b;
-            font-weight: 400;
-        }
-        
-        input, textarea {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #404040;
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 16px;
-            background: #1a1a1a;
-            color: #e8e8e8;
-            transition: border-color 0.2s, background 0.2s;
-            -webkit-appearance: none;
-            -moz-appearance: textfield;
-        }
-        
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #a35705;
-            background: #242424;
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 88px;
-            font-family: inherit;
-            line-height: 1.5;
-        }
-        
-        .kbju-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        
-        .kbju-grid input {
-            margin-bottom: 0;
-        }
-        
-        .kbju-labels {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .kbju-labels label {
-            margin-bottom: 0;
-            text-align: center;
-            font-size: 13px;
-            color: #9b9b9b;
-        }
-        
-        button {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 16px;
-            transition: all 0.2s;
-        }
-        
-        .add-btn {
-            background: #2d2d2d;
-            color: #e8e8e8;
-            border: 1px solid #404040;
-        }
-        
-        .add-btn:hover {
-            background: #3a3a3a;
-        }
-        
-        .calculate-btn {
-            background: #a35705;
-            color: white;
-            font-size: 17px;
-            font-weight: 600;
-            margin-top: 24px;
-            box-shadow: 0 2px 8px rgba(163, 87, 5, 0.3);
-            transition: all 0.2s;
-        }
-        
-        .calculate-btn:disabled {
-            background: #4a4a4a;
-            color: #808080;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        
-        .calculate-btn:not(:disabled):hover {
-            background: #b5660a;
-        }
-        
-        .result {
-            background: #2d2d2d;
-            padding: 28px 24px;
-            border-radius: 16px;
-            margin-top: 28px;
-            display: none;
-            border: 1px solid #404040;
-        }
-        
-        .result.show {
-            display: block;
-        }
-        
-        .result h2 {
-            font-size: 20px;
-            margin-bottom: 24px;
-            color: #f5f5f5;
-            font-weight: 400;
-        }
-        
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-        
-        .result-item {
-            text-align: center;
-            background: #1a1a1a;
-            padding: 20px 12px;
-            border-radius: 12px;
-            border: 1px solid #404040;
-        }
-        
-        .result-label {
-            font-size: 13px;
-            color: #9b9b9b;
-            margin-bottom: 10px;
-        }
-        
-        .result-value {
-            font-size: 26px;
-            font-weight: 600;
-            color: #d97706;
-            letter-spacing: -0.5px;
-        }
-        
-        .save-section {
-            margin-top: 24px;
-        }
-        
-        .new-dish-btn {
-            background: #2d2d2d;
-            color: #e8e8e8;
-            margin-top: 12px;
-            border: 1px solid #404040;
-        }
-        
-        .new-dish-btn:hover {
-            background: #3a3a3a;
-        }
-        
-        .history {
-            margin-top: 48px;
-        }
-        
-        .history h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #f5f5f5;
-            font-weight: 400;
-        }
-        
-        .history-item {
-            background: #2d2d2d;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border: 1px solid #404040;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        
-        .history-item:hover {
-            background: #3a3a3a;
-        }
-        
-        .history-content {
-            flex: 1;
-        }
-        
-        .history-delete {
-            background: none;
-            border: none;
-            color: #a35705;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            transition: background 0.2s;
-            font-weight: 300;
-            flex-shrink: 0;
-        }
-        
-        .history-delete:hover {
-            background: rgba(163, 87, 5, 0.1);
-        }
-        
-        .history-name {
-            font-weight: 500;
-            margin-bottom: 10px;
-            color: #f5f5f5;
-            font-size: 17px;
-        }
-        
-        .history-kbju {
-            font-size: 14px;
-            color: #9b9b9b;
-            margin-bottom: 8px;
-        }
-        
-        .history-note {
-            font-size: 14px;
-            color: #808080;
-            font-style: italic;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #404040;
-        }
-        
-        .clear-history {
-            background: #3d2d2d;
-            color: #ff6b6b;
-            font-size: 15px;
-            padding: 14px;
-            border: 1px solid #4d3d3d;
-        }
-        
-        .clear-history:hover {
-            background: #4d3d3d;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КБЖУ</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+background:#1a1a1a;color:#e8e8e8;padding:24px;padding-bottom:120px
+}
+.container{max-width:680px;margin:0 auto}
+h1{font-size:28px;margin-bottom:28px;font-weight:400}
+
+.ingredient{background:#2d2d2d;border-radius:14px;padding:20px;margin-bottom:16px;border:1px solid #404040}
+.ingredient-header{display:flex;justify-content:space-between;margin-bottom:16px;color:#9b9b9b}
+.remove-btn{background:none;border:none;color:#a35705;font-size:18px;cursor:pointer}
+
+label{font-size:14px;color:#9b9b9b;margin-bottom:6px;display:block}
+input,textarea{
+width:100%;padding:14px;border-radius:10px;
+border:1px solid #404040;background:#1a1a1a;color:#fff;
+margin-bottom:14px;font-size:16px
+}
+input:disabled{opacity:.6}
+
+.kbju-labels,.kbju-grid{
+display:grid;grid-template-columns:repeat(4,1fr);gap:10px
+}
+.kbju-labels label{text-align:left;font-size:13px}
+
+button{
+width:100%;padding:16px;border-radius:12px;
+border:1px solid #404040;background:#2d2d2d;color:#fff;
+font-size:16px;cursor:pointer;margin-top:16px
+}
+.calculate-btn{background:#a35705;border:none;font-weight:600}
+
+.result{display:none;background:#2d2d2d;padding:20px;border-radius:14px;margin-top:24px}
+.result.show{display:block}
+
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.result-item input{text-align:left;font-weight:600}
+
+.autocomplete-wrapper{position:relative}
+.autocomplete-list{
+position:absolute;top:100%;left:0;right:0;
+background:#2d2d2d;border:1px solid #404040;border-radius:12px;
+max-height:240px;overflow:auto;z-index:1000;display:none
+}
+.autocomplete-item{
+padding:14px;display:flex;justify-content:space-between;
+cursor:pointer
+}
+.autocomplete-item:hover{background:#3a3a3a}
+.autocomplete-item span{opacity:.6}
+.autocomplete-item button{
+background:none;border:none;color:#a35705;font-size:16px;cursor:pointer
+}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Калькулятор КБЖУ</h1>
-        
-        <div id="ingredients"></div>
-        
-        <button class="add-btn" onclick="addIngredient()">+ Добавить ингредиент</button>
-        
-        <div style="margin-top: 28px;">
-            <label>Вес готового блюда (г)</label>
-            <input type="number" id="finalWeight" placeholder="Автоматически">
-        </div>
-        
-        <button class="calculate-btn" id="calculateBtn" onclick="calculate()" disabled>Рассчитать</button>
-        
-        <div class="result" id="result">
-            <h2>Результат (на 100г)</h2>
-            <div class="result-grid">
-                <div class="result-item">
-                    <div class="result-label">Калории</div>
-                    <div class="result-value" id="resCalories">0</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Белки</div>
-                    <div class="result-value" id="resProtein">0</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Жиры</div>
-                    <div class="result-value" id="resFat">0</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Углеводы</div>
-                    <div class="result-value" id="resCarbs">0</div>
-                </div>
-            </div>
-            
-            <div class="save-section">
-                <label>Название блюда</label>
-                <input type="text" id="dishName" placeholder="Например: Грудка в сухарях">
-                
-                <label>Заметка (необязательно)</label>
-                <textarea id="dishNote" placeholder="Время готовки, особенности..."></textarea>
-                
-                <button class="calculate-btn" onclick="saveToHistory()">Сохранить в историю</button>
-                <button class="new-dish-btn" onclick="newDish()">Рассчитать новое блюдо</button>
-            </div>
-        </div>
-        
-        <div class="history" id="historySection" style="display: none;">
-            <h2>История блюд</h2>
-            <div id="historyList"></div>
-            <button class="clear-history" onclick="clearHistory()">Очистить историю</button>
-        </div>
-    </div>
+<div class="container">
+<h1>Калькулятор КБЖУ</h1>
 
-    <script>
-        const productDatabase = [
-            { name: 'Масло подсолнечное', cal: 899, prot: 0, fat: 99.9, carb: 0 },
-            { name: 'Масло сливочное', cal: 748, prot: 0.5, fat: 82.5, carb: 0.8 },
-            { name: 'Грудка куриная', cal: 113, prot: 23.6, fat: 1.9, carb: 0.4 },
-            { name: 'Яйцо куриное', cal: 157, prot: 12.7, fat: 11.5, carb: 0.7 },
-            { name: 'Сухари панировочные', cal: 347, prot: 11.3, fat: 1.8, carb: 72.1 },
-            { name: 'Морковь сырая', cal: 35, prot: 1.3, fat: 0.1, carb: 6.9 },
-            { name: 'Картофель сырой', cal: 77, prot: 2, fat: 0.4, carb: 16.3 },
-            { name: 'Лук репчатый сырой', cal: 41, prot: 1.4, fat: 0.2, carb: 8.2 }
-        ];
+<div id="ingredients"></div>
 
-        let customProducts = JSON.parse(localStorage.getItem('custom_products') || '[]');
-        let ingredientCount = 0;
-        let activeIngredients = [];
-        let history = JSON.parse(localStorage.getItem('kbju_history') || '[]');
+<button onclick="addIngredient()">Добавить ингредиент</button>
 
-        function getAllProducts() {
-            return [...productDatabase, ...customProducts];
-        }
+<label style="display:flex;gap:10px;align-items:center;margin-top:20px">
+<input type="checkbox" id="noCooking" onchange="toggleCooking()"> Без термической обработки
+</label>
 
-        function saveCustomProduct(name, cal, prot, fat, carb) {
-            const existing = customProducts.find(p => p.name.toLowerCase() === name.toLowerCase());
-            if (!existing && name.trim()) {
-                customProducts.push({ name, cal, prot, fat, carb });
-                localStorage.setItem('custom_products', JSON.stringify(customProducts));
-            }
-        }
+<label>Вес готового блюда (г)</label>
+<input type="number" id="finalWeight">
 
-        function addIngredient() {
-            ingredientCount++;
-            activeIngredients.push(ingredientCount);
-            const container = document.getElementById('ingredients');
-            const div = document.createElement('div');
-            div.className = 'ingredient';
-            div.id = `ingredient-${ingredientCount}`;
-            const isFirst = activeIngredients.length === 1;
-            div.innerHTML = `
-                <div class="ingredient-header">
-                    <span class="ingredient-number">Ингредиент ${activeIngredients.length}</span>
-                    ${!isFirst ? `<button class="remove-btn" onclick="removeIngredient(${ingredientCount})">✕</button>` : '<div style="width: 24px;"></div>'}
-                </div>
-                <div class="autocomplete-wrapper">
-                    <label>Название</label>
-                    <input type="text" id="name-${ingredientCount}" placeholder="Начните вводить..." oninput="showAutocomplete(${ingredientCount})">
-                    <div class="autocomplete-list" id="autocomplete-${ingredientCount}"></div>
-                </div>
-                <div class="kbju-labels">
-                    <label>Калории</label>
-                    <label>Белки</label>
-                    <label>Жиры</label>
-                    <label>Углев.</label>
-                </div>
-                <div class="kbju-grid">
-                    <input type="number" step="0.1" id="cal-${ingredientCount}" placeholder="0" oninput="checkCalculateButton()">
-                    <input type="number" step="0.1" id="prot-${ingredientCount}" placeholder="0" oninput="checkCalculateButton()">
-                    <input type="number" step="0.1" id="fat-${ingredientCount}" placeholder="0" oninput="checkCalculateButton()">
-                    <input type="number" step="0.1" id="carb-${ingredientCount}" placeholder="0" oninput="checkCalculateButton()">
-                </div>
-                <label>Вес (г)</label>
-                <input type="number" id="weight-${ingredientCount}" placeholder="Например: 500" oninput="updateTotalWeight(); checkCalculateButton();">
-            `;
-            container.appendChild(div);
-            checkCalculateButton();
-        }
+<button class="calculate-btn" onclick="calculate()">Рассчитать</button>
 
-        function removeIngredient(id) {
-            const element = document.getElementById(`ingredient-${id}`);
-            if (element) {
-                element.remove();
-                const index = activeIngredients.indexOf(id);
-                if (index > -1) {
-                    activeIngredients.splice(index, 1);
-                }
-                updateIngredientNumbers();
-                updateTotalWeight();
-                checkCalculateButton();
-            }
-        }
+<div class="result" id="result">
+<h2 style="margin-bottom:16px">Результат (на 100 г)</h2>
+<div class="result-grid">
+<input readonly id="resCal">
+<input readonly id="resProt">
+<input readonly id="resFat">
+<input readonly id="resCarb">
+</div>
+</div>
+</div>
 
-        function updateIngredientNumbers() {
-            activeIngredients.forEach((id, index) => {
-                const element = document.getElementById(`ingredient-${id}`);
-                if (element) {
-                    const header = element.querySelector('.ingredient-number');
-                    if (header) {
-                        header.textContent = `Ингредиент ${index + 1}`;
-                    }
-                }
-            });
-        }
+<script>
+const baseProducts=[
+{name:'Масло подсолнечное',cal:899,prot:0,fat:99.9,carb:0},
+{name:'Грудка куриная',cal:113,prot:23.6,fat:1.9,carb:0.4}
+];
 
-        function updateTotalWeight() {
-            let total = 0;
-            activeIngredients.forEach(id => {
-                const weightEl = document.getElementById(`weight-${id}`);
-                if (weightEl) {
-                    const weight = parseFloat(weightEl.value) || 0;
-                    total += weight;
-                }
-            });
-            document.getElementById('finalWeight').value = total > 0 ? total : '';
-        }
+let customProducts=JSON.parse(localStorage.getItem('custom_products')||'[]');
+let ingredientId=0;
+let noCooking=false;
 
-        function checkCalculateButton() {
-            const btn = document.getElementById('calculateBtn');
-            let hasData = false;
-            
-            for (let id of activeIngredients) {
-                const weight = parseFloat(document.getElementById(`weight-${id}`)?.value) || 0;
-                const cal = parseFloat(document.getElementById(`cal-${id}`)?.value) || 0;
-                const prot = parseFloat(document.getElementById(`prot-${id}`)?.value) || 0;
-                const fat = parseFloat(document.getElementById(`fat-${id}`)?.value) || 0;
-                const carb = parseFloat(document.getElementById(`carb-${id}`)?.value) || 0;
-                
-                if (weight > 0 && (cal > 0 || prot > 0 || fat > 0 || carb > 0)) {
-                    hasData = true;
-                    break;
-                }
-            }
-            
-            btn.disabled = !hasData;
-        }
+function allProducts(){
+return [
+...customProducts.sort((a,b)=>a.name.localeCompare(b.name)),
+...baseProducts.sort((a,b)=>a.name.localeCompare(b.name))
+];
+}
 
-        function showAutocomplete(id) {
-            const input = document.getElementById(`name-${id}`);
-            const list = document.getElementById(`autocomplete-${id}`);
-            const value = input.value.toLowerCase();
+function deleteCustom(name){
+customProducts=customProducts.filter(p=>p.name!==name);
+localStorage.setItem('custom_products',JSON.stringify(customProducts));
+}
 
-            if (value.length < 1) {
-                list.classList.remove('show');
-                return;
-            }
+function toggleCooking(){
+noCooking=document.getElementById('noCooking').checked;
+const fw=document.getElementById('finalWeight');
+fw.disabled=noCooking;
+if(noCooking) updateFinalWeight();
+}
 
-            const allProducts = getAllProducts();
-            const matches = allProducts.filter(p => 
-                p.name.toLowerCase().includes(value)
-            );
+function updateFinalWeight(){
+if(!noCooking) return;
+let total=0;
+document.querySelectorAll('[id^="weight-"]').forEach(i=>{
+total+=parseFloat(i.value)||0;
+});
+document.getElementById('finalWeight').value=total||'';
+}
 
-            if (matches.length === 0) {
-                list.classList.remove('show');
-                return;
-            }
+function addIngredient(){
+ingredientId++;
+const d=document.createElement('div');
+d.className='ingredient';
+d.innerHTML=`
+<div class="ingredient-header">
+Ингредиент
+<button class="remove-btn" onclick="this.closest('.ingredient').remove()">✕</button>
+</div>
 
-            list.innerHTML = matches.map(p => 
-                `<div class="autocomplete-item" onclick="selectProduct(${id}, '${p.name}', ${p.cal}, ${p.prot}, ${p.fat}, ${p.carb})">${p.name}</div>`
-            ).join('');
-            list.classList.add('show');
-        }
+<div class="autocomplete-wrapper">
+<label>Название</label>
+<input id="name-${ingredientId}" oninput="showAuto(${ingredientId})">
+<div class="autocomplete-list" id="list-${ingredientId}"></div>
+</div>
 
-        function selectProduct(id, name, cal, prot, fat, carb) {
-            document.getElementById(`name-${id}`).value = name;
-            document.getElementById(`cal-${id}`).value = cal;
-            document.getElementById(`prot-${id}`).value = prot;
-            document.getElementById(`fat-${id}`).value = fat;
-            document.getElementById(`carb-${id}`).value = carb;
-            document.getElementById(`autocomplete-${id}`).classList.remove('show');
-        }
+<div class="kbju-labels">
+<label>Калории</label><label>Белки</label><label>Жиры</label><label>Углев.</label>
+</div>
+<div class="kbju-grid">
+<input id="cal-${ingredientId}">
+<input id="prot-${ingredientId}">
+<input id="fat-${ingredientId}">
+<input id="carb-${ingredientId}">
+</div>
 
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.autocomplete-wrapper')) {
-                document.querySelectorAll('.autocomplete-list').forEach(list => {
-                    list.classList.remove('show');
-                });
-            }
-        });
+<label>Вес (г)</label>
+<input id="weight-${ingredientId}" oninput="updateFinalWeight()">
+`;
+document.getElementById('ingredients').appendChild(d);
+}
 
-        function calculate() {
-            const finalWeight = parseFloat(document.getElementById('finalWeight').value);
-            if (!finalWeight || finalWeight <= 0) {
-                alert('Добавьте ингредиенты с весом');
-                return;
-            }
+function showAuto(id){
+const v=document.getElementById(`name-${id}`).value.toLowerCase();
+const list=document.getElementById(`list-${id}`);
+if(!v){list.style.display='none';return}
 
-            let totalCal = 0, totalProt = 0, totalFat = 0, totalCarb = 0;
+list.innerHTML='';
+allProducts().filter(p=>p.name.toLowerCase().includes(v)).forEach(p=>{
+const item=document.createElement('div');
+item.className='autocomplete-item';
+item.innerHTML=`${p.name}${customProducts.find(c=>c.name===p.name)?'<button>✕</button>':''}`;
+item.onclick=()=>{
+document.getElementById(`name-${id}`).value=p.name;
+document.getElementById(`cal-${id}`).value=p.cal;
+document.getElementById(`prot-${id}`).value=p.prot;
+document.getElementById(`fat-${id}`).value=p.fat;
+document.getElementById(`carb-${id}`).value=p.carb;
+list.style.display='none';
+};
+if(customProducts.find(c=>c.name===p.name)){
+item.querySelector('button').onclick=e=>{
+e.stopPropagation();
+deleteCustom(p.name);
+showAuto(id);
+};
+}
+list.appendChild(item);
+});
+list.style.display='block';
+}
 
-            activeIngredients.forEach(id => {
-                const nameEl = document.getElementById(`name-${id}`);
-                if (!nameEl) return;
+function calculate(){
+let tc=0,tp=0,tf=0,tu=0;
+document.querySelectorAll('[id^="weight-"]').forEach(w=>{
+const id=w.id.split('-')[1];
+const weight=parseFloat(w.value)||0;
+tc+=weight*(parseFloat(document.getElementById(`cal-${id}`).value)||0)/100;
+tp+=weight*(parseFloat(document.getElementById(`prot-${id}`).value)||0)/100;
+tf+=weight*(parseFloat(document.getElementById(`fat-${id}`).value)||0)/100;
+tu+=weight*(parseFloat(document.getElementById(`carb-${id}`).value)||0)/100;
+});
 
-                const name = nameEl.value.trim();
-                const weight = parseFloat(document.getElementById(`weight-${id}`).value) || 0;
-                const cal = parseFloat(document.getElementById(`cal-${id}`).value) || 0;
-                const prot = parseFloat(document.getElementById(`prot-${id}`).value) || 0;
-                const fat = parseFloat(document.getElementById(`fat-${id}`).value) || 0;
-                const carb = parseFloat(document.getElementById(`carb-${id}`).value) || 0;
+const fw=parseFloat(document.getElementById('finalWeight').value);
+document.getElementById('resCal').value=Math.round(tc/fw*100);
+document.getElementById('resProt').value=Math.round(tp/fw*100);
+document.getElementById('resFat').value=Math.round(tf/fw*100);
+document.getElementById('resCarb').value=Math.round(tu/fw*100);
 
-                if (weight > 0) {
-                    totalCal += (cal * weight) / 100;
-                    totalProt += (prot * weight) / 100;
-                    totalFat += (fat * weight) / 100;
-                    totalCarb += (carb * weight) / 100;
-                    
-                    if (name && (cal > 0 || prot > 0 || fat > 0 || carb > 0)) {
-                        saveCustomProduct(name, cal, prot, fat, carb);
-                    }
-                }
-            });
+document.getElementById('result').classList.add('show');
+}
 
-            const per100g = {
-                cal: Math.round(totalCal / finalWeight * 100),
-                prot: Math.round(totalProt / finalWeight * 100),
-                fat: Math.round(totalFat / finalWeight * 100),
-                carb: Math.round(totalCarb / finalWeight * 100)
-            };
-
-            document.getElementById('resCalories').textContent = per100g.cal;
-            document.getElementById('resProtein').textContent = per100g.prot;
-            document.getElementById('resFat').textContent = per100g.fat;
-            document.getElementById('resCarbs').textContent = per100g.carb;
-
-            document.getElementById('result').classList.add('show');
-            document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        function saveToHistory() {
-            const name = document.getElementById('dishName').value || 'Без названия';
-            const note = document.getElementById('dishNote').value;
-            const cal = document.getElementById('resCalories').textContent;
-            const prot = document.getElementById('resProtein').textContent;
-            const fat = document.getElementById('resFat').textContent;
-            const carb = document.getElementById('resCarbs').textContent;
-
-            const dish = {
-                name,
-                note,
-                cal,
-                prot,
-                fat,
-                carb,
-                date: new Date().toLocaleDateString('ru-RU')
-            };
-
-            history.unshift(dish);
-            if (history.length > 50) history = history.slice(0, 50);
-            localStorage.setItem('kbju_history', JSON.stringify(history));
-            
-            displayHistory();
-            alert('Блюдо сохранено в историю');
-        }
-
-        function newDish() {
-            document.getElementById('ingredients').innerHTML = '';
-            ingredientCount = 0;
-            activeIngredients = [];
-            document.getElementById('finalWeight').value = '';
-            document.getElementById('result').classList.remove('show');
-            document.getElementById('dishName').value = '';
-            document.getElementById('dishNote').value = '';
-            addIngredient();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function displayHistory() {
-            if (history.length === 0) {
-                document.getElementById('historySection').style.display = 'none';
-                return;
-            }
-
-            document.getElementById('historySection').style.display = 'block';
-            const list = document.getElementById('historyList');
-            list.innerHTML = history.map((dish, index) => `
-                <div class="history-item">
-                    <div class="history-content" onclick="loadFromHistory(${index})">
-                        <div class="history-name">${dish.name}</div>
-                        <div class="history-kbju">${dish.cal} ккал · Б: ${dish.prot}г · Ж: ${dish.fat}г · У: ${dish.carb}г · ${dish.date}</div>
-                        ${dish.note ? `<div class="history-note">${dish.note}</div>` : ''}
-                    </div>
-                    <button class="history-delete" onclick="deleteHistoryItem(${index}, event)">✕</button>
-                </div>
-            `).join('');
-        }
-
-        function deleteHistoryItem(index, event) {
-            event.stopPropagation();
-            if (confirm('Удалить это блюдо из истории?')) {
-                history.splice(index, 1);
-                localStorage.setItem('kbju_history', JSON.stringify(history));
-                displayHistory();
-            }
-        }
-
-        function loadFromHistory(index) {
-            const dish = history[index];
-            document.getElementById('resCalories').textContent = dish.cal;
-            document.getElementById('resProtein').textContent = dish.prot;
-            document.getElementById('resFat').textContent = dish.fat;
-            document.getElementById('resCarbs').textContent = dish.carb;
-            document.getElementById('dishName').value = dish.name;
-            document.getElementById('dishNote').value = dish.note || '';
-            document.getElementById('result').classList.add('show');
-            document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function clearHistory() {
-            if (confirm('Удалить всю историю?')) {
-                history = [];
-                localStorage.removeItem('kbju_history');
-                displayHistory();
-            }
-        }
-
-        addIngredient();
-        displayHistory();
-    </script>
+addIngredient();
+</script>
 </body>
 </html>
