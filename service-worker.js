@@ -1,8 +1,8 @@
 const CACHE_NAME = 'kbju-calculator-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
 // Установка Service Worker
