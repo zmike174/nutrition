@@ -1,4 +1,5 @@
-const CACHE_NAME = 'kbju-calculator-v1';
+const CACHE_VERSION = 'v1.0.1'; // Меняй это при каждом обновлении!
+const CACHE_NAME = `nutrition-${CACHE_VERSION}`;
 const urlsToCache = [
   './',
   './index.html',
@@ -7,10 +8,13 @@ const urlsToCache = [
 
 // Установка Service Worker
 self.addEventListener('install', event => {
+  // Пропускаем ожидание и сразу активируем новую версию
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Кэш открыт');
+        console.log('Кэш открыт:', CACHE_VERSION);
         return cache.addAll(urlsToCache);
       })
   );
@@ -22,23 +26,37 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
+          // Удаляем все старые кэши
           if (cacheName !== CACHE_NAME) {
             console.log('Удаление старого кэша:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      // Захватываем контроль над всеми открытыми страницами
+      return self.clients.claim();
     })
   );
 });
 
-// Перехват запросов
+// Перехват запросов - стратегия Network First (сеть приоритетнее кэша)
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        // Возвращаем из кэша или загружаем из сети
-        return response || fetch(event.request);
+        // Клонируем ответ, т.к. response можно использовать только раз
+        const responseToCache = response.clone();
+        
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
+        });
+        
+        return response;
+      })
+      .catch(() => {
+        // Если сеть недоступна, берём из кэша
+        return caches.match(event.request);
       })
   );
 });
