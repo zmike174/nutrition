@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.0.2'; // Меняй это при каждом обновлении!
+const CACHE_VERSION = 'v1.0.3'; // Меняй это при каждом обновлении!
 const CACHE_NAME = `nutrition-${CACHE_VERSION}`;
 const urlsToCache = [
   './',
