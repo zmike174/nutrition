@@ -5,21 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="manifest" href="manifest.json">
     <title>КБЖУ Калькулятор</title>
     <style>
+        :root {
+            --color-bg-primary: #1a1a1a;
+            --color-bg-secondary: #2d2d2d;
+            --color-bg-hover: #3a3a3a;
+            --color-border: #404040;
+            --color-border-light: #3a3a3a;
+            --color-text-primary: #e8e8e8;
+            --color-text-secondary: #9b9b9b;
+            --color-text-tertiary: #808080;
+            --color-text-bright: #f5f5f5;
+            --color-accent: #a35705;
+            --color-accent-hover: #b5660a;
+            --color-accent-bg: rgba(163, 87, 5, 0.2);
+            --color-delete: #ff6b6b;
+            --color-delete-bg: rgba(255, 107, 107, 0.1);
+            --color-disabled-bg: #4a4a4a;
+            --color-disabled-text: #808080;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #1a1a1a;
-            color: #e8e8e8;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
             padding: 24px 20px;
             padding-bottom: 100px;
             line-height: 1.5;
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
         }
         
         .container {
@@ -30,13 +57,14 @@
         h1 {
             font-size: 32px;
             margin-bottom: 32px;
-            color: #f5f5f5;
+            color: var(--color-text-bright);
             font-weight: 400;
             letter-spacing: -0.5px;
+            user-select: none;
         }
         
         .ingredient {
-            background: #2d2d2d;
+            background: var(--color-bg-secondary);
             padding: 24px;
             border-radius: 16px;
             margin-bottom: 16px;
@@ -47,39 +75,46 @@
         .ingredient-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
             margin-bottom: 20px;
             line-height: 1;
         }
         
-        .ingredient-number {
-            font-weight: 400;
-            color: #9b9b9b;
-            font-size: 15px;
-            line-height: 1;
+        .ingredient-header .btn-icon {
+            margin-top: -2px;
         }
         
-        .remove-btn {
+        .ingredient-number {
+            font-weight: 400;
+            color: var(--color-text-secondary);
+            font-size: 15px;
+            line-height: 1;
+            user-select: none;
+        }
+        
+        .btn-icon {
             background: none;
             border: none;
-            color: #a35705;
+            color: var(--color-accent);
             font-size: 18px;
             cursor: pointer;
             padding: 0;
             width: 24px;
             height: 24px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             border-radius: 6px;
-            transition: background 0.2s;
+            transition: background 0.2s, color 0.2s;
             font-weight: 300;
             line-height: 1;
-            margin-top: -2px;
+            user-select: none;
+            flex-shrink: 0;
         }
         
-        .remove-btn:hover {
-            background: rgba(255, 107, 107, 0.1);
+        .btn-icon:hover {
+            background: var(--color-accent-bg);
+            color: var(--color-delete);
         }
         
         .autocomplete-wrapper {
@@ -92,41 +127,41 @@
             top: calc(100% + 4px);
             left: 0;
             right: 0;
-            background: #2d2d2d;
-            border: 1px solid #404040;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
             border-radius: 12px;
             max-height: 240px;
             overflow-y: auto;
             z-index: 1000;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             display: none;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         
         .autocomplete-list::-webkit-scrollbar {
             display: none;
         }
         
-        .autocomplete-list {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
         .autocomplete-list.show {
             display: block;
         }
         
-        /* Стили списка */
         .autocomplete-item {
             position: relative;
-            padding: 0;
+            padding: 0 16px;
             cursor: pointer;
-            color: #e8e8e8;
+            color: var(--color-text-primary);
             font-size: 15px;
             transition: background 0.15s;
-            border-bottom: 1px solid #3a3a3a;
-            height: 52px;
+            border-bottom: 1px solid var(--color-border-light);
+            min-height: 52px;
             display: flex;
-            align-items: center;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 16px;
+            padding-bottom: 16px;
         }
         
         .autocomplete-item:last-child {
@@ -139,70 +174,61 @@
         }
         
         .autocomplete-item:hover {
-            background: #3a3a3a;
+            background: var(--color-bg-hover);
         }
 
-        /* Текст внутри списка */
         .autocomplete-content {
             flex: 1;
-            padding: 0 16px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            line-height: 52px;
+            line-height: 1.3;
         }
         
-        /* Отступ справа если есть кнопка, чтобы текст не наезжал */
-        .autocomplete-item.has-delete .autocomplete-content {
-            padding-right: 48px;
-        }
-        
-        /* Кнопка удаления - теперь точь-в-точь как remove-btn */
         .autocomplete-delete {
-            position: absolute;
-            right: 12px; /* Небольшой отступ от края, как в header */
-            top: 50%;
-            transform: translateY(-50%); /* Строго по центру */
-            width: 24px;
-            height: 24px;
-            padding: 0;
             background: none;
             border: none;
-            color: #a35705;
+            color: var(--color-accent);
             font-size: 18px;
             cursor: pointer;
-            display: flex;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             border-radius: 6px;
-            transition: background 0.2s;
+            transition: background 0.2s, color 0.2s;
             font-weight: 300;
-            z-index: 2;
             line-height: 1;
+            user-select: none;
+            flex-shrink: 0;
+            margin-top: -2px;
         }
         
         .autocomplete-delete:hover {
-            background: rgba(163, 87, 5, 0.2);
-            color: #ff6b6b;
+            background: var(--color-accent-bg);
+            color: var(--color-delete);
         }
         
         label {
             display: block;
             margin-bottom: 10px;
             font-size: 14px;
-            color: #9b9b9b;
+            color: var(--color-text-secondary);
             font-weight: 400;
+            user-select: none;
         }
         
         input, textarea {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid #404040;
+            border: 1px solid var(--color-border);
             border-radius: 10px;
             font-size: 16px;
             margin-bottom: 16px;
-            background: #1a1a1a;
-            color: #e8e8e8;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
             transition: border-color 0.2s, background 0.2s;
             -webkit-appearance: none;
             -moz-appearance: textfield;
@@ -226,8 +252,12 @@
         
         input:focus, textarea:focus {
             outline: none;
-            border-color: #a35705;
+            border-color: var(--color-accent);
             background: #242424;
+        }
+        
+        input::placeholder {
+            color: var(--color-text-tertiary);
         }
         
         textarea {
@@ -258,7 +288,7 @@
         .kbju-labels label {
             margin-bottom: 0;
             font-size: 14px;
-            color: #9b9b9b;
+            color: var(--color-text-secondary);
         }
         
         button {
@@ -271,20 +301,22 @@
             cursor: pointer;
             margin-top: 16px;
             transition: all 0.2s;
+            user-select: none;
+            touch-action: manipulation;
         }
         
         .add-btn {
-            background: #2d2d2d;
-            color: #e8e8e8;
-            border: 1px solid #404040;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
         }
         
         .add-btn:hover {
-            background: #3a3a3a;
+            background: var(--color-bg-hover);
         }
         
         .calculate-btn {
-            background: #a35705;
+            background: var(--color-accent);
             color: white;
             font-size: 16px;
             font-weight: 500;
@@ -294,18 +326,18 @@
         }
         
         .calculate-btn:disabled {
-            background: #4a4a4a;
-            color: #808080;
+            background: var(--color-disabled-bg);
+            color: var(--color-disabled-text);
             cursor: not-allowed;
             box-shadow: none;
         }
         
         .calculate-btn:not(:disabled):hover {
-            background: #b5660a;
+            background: var(--color-accent-hover);
         }
         
         .result {
-            background: #2d2d2d;
+            background: var(--color-bg-secondary);
             padding: 24px;
             border-radius: 16px;
             margin-top: 28px;
@@ -320,14 +352,15 @@
         .result h2 {
             font-size: 15px;
             margin-bottom: 20px;
-            color: #9b9b9b;
+            color: var(--color-text-secondary);
             font-weight: 400;
+            user-select: none;
         }
         
         .result .kbju-grid input {
-            background: #1a1a1a;
+            background: var(--color-bg-primary);
             cursor: default;
-            color: #e8e8e8;
+            color: var(--color-text-primary);
             font-weight: 400;
             text-align: left;
             font-size: 16px;
@@ -340,16 +373,16 @@
         }
         
         .new-dish-btn {
-            background: #2d2d2d;
-            color: #e8e8e8;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
             margin-top: 12px;
-            border: 1px solid #404040;
+            border: 1px solid var(--color-border);
             font-size: 16px;
             font-weight: 500;
         }
         
         .new-dish-btn:hover {
-            background: #3a3a3a;
+            background: var(--color-bg-hover);
         }
         
         .history {
@@ -359,87 +392,71 @@
         .history h2 {
             font-size: 24px;
             margin-bottom: 20px;
-            color: #f5f5f5;
+            color: var(--color-text-bright);
             font-weight: 400;
+            user-select: none;
         }
         
         .history-item {
-            background: #2d2d2d;
+            background: var(--color-bg-secondary);
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 12px;
             cursor: pointer;
             transition: background 0.2s;
-            border: 1px solid #404040;
+            border: 1px solid var(--color-border);
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: baseline;
             gap: 12px;
         }
         
+        .history-item .btn-icon {
+            margin-top: -2px;
+        }
+        
         .history-item:hover {
-            background: #3a3a3a;
+            background: var(--color-bg-hover);
         }
         
         .history-content {
             flex: 1;
         }
         
-        .history-delete {
-            background: none;
-            border: none;
-            color: #a35705;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            transition: background 0.2s;
-            font-weight: 300;
-            flex-shrink: 0;
-            margin-top: 0;
-        }
-        
-        .history-delete:hover {
-            background: rgba(163, 87, 5, 0.1);
-        }
-        
         .history-name {
             font-weight: 500;
             margin-bottom: 10px;
-            color: #f5f5f5;
+            color: var(--color-text-bright);
             font-size: 17px;
         }
         
         .history-kbju {
             font-size: 14px;
-            color: #9b9b9b;
+            color: var(--color-text-secondary);
             margin-bottom: 8px;
         }
         
         .history-note {
             font-size: 14px;
-            color: #808080;
+            color: var(--color-text-tertiary);
             font-style: italic;
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px solid #404040;
+            border-top: 1px solid var(--color-border);
         }
         
         .clear-history {
             background: #3d2d2d;
-            color: #ff6b6b;
+            color: var(--color-accent);
             font-size: 15px;
             padding: 14px;
             border: 1px solid #4d3d3d;
+            transition: background 0.2s, color 0.2s;
         }
         
         .clear-history:hover {
             background: #4d3d3d;
+            color: var(--color-delete);
         }
     </style>
 </head>
@@ -449,14 +466,14 @@
         
         <div id="ingredients"></div>
         
-        <button class="add-btn" onclick="addIngredient()">Добавить ингредиент</button>
+        <button class="add-btn" id="addIngredientBtn" aria-label="Добавить ингредиент">Добавить ингредиент</button>
         
         <div style="margin-top: 28px;">
             <label>Вес готового блюда (г)</label>
-            <input type="text" inputmode="decimal" id="finalWeight" placeholder="Автоматически" oninput="sanitizeNumberInput(this)" onwheel="this.blur()">
+            <input type="text" inputmode="decimal" id="finalWeight" placeholder="0" aria-label="Вес готового блюда">
         </div>
         
-        <button class="calculate-btn" id="calculateBtn" onclick="calculate()" disabled>Рассчитать</button>
+        <button class="calculate-btn" id="calculateBtn" disabled aria-label="Рассчитать КБЖУ">Рассчитать</button>
         
         <div class="result" id="result">
             <h2>Результат (на 100г)</h2>
@@ -475,24 +492,38 @@
             
             <div class="save-section">
                 <label>Название блюда</label>
-                <input type="text" id="dishName" placeholder="Например: Грудка в сухарях" oninput="checkSaveButton()">
+                <input type="text" id="dishName" placeholder="Например: Грудка в сухарях" aria-label="Название блюда">
                 
                 <label>Заметка (необязательно)</label>
-                <textarea id="dishNote" placeholder="Время готовки, особенности..." oninput="checkSaveButton()"></textarea>
+                <textarea id="dishNote" placeholder="Время готовки, особенности..." aria-label="Заметка о блюде"></textarea>
                 
-                <button class="calculate-btn" id="saveBtn" onclick="saveToHistory()" disabled>Сохранить в историю</button>
-                <button class="new-dish-btn" onclick="newDish()">Рассчитать новое блюдо</button>
+                <button class="calculate-btn" id="saveBtn" disabled aria-label="Сохранить в историю">Сохранить в историю</button>
+                <button class="new-dish-btn" id="newDishBtn" aria-label="Рассчитать новое блюдо">Рассчитать новое блюдо</button>
             </div>
         </div>
         
         <div class="history" id="historySection" style="display: none;">
             <h2>История блюд</h2>
             <div id="historyList"></div>
-            <button class="clear-history" onclick="clearHistory()">Очистить историю</button>
+            <button class="clear-history" id="clearHistoryBtn" aria-label="Очистить всю историю">Очистить историю</button>
         </div>
     </div>
 
     <script>
+        // ========== УТИЛИТЫ ==========
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ========== ДАННЫЕ ==========
         const productDatabase = [
             { name: 'Масло подсолнечное', cal: 899, prot: 0, fat: 99.9, carb: 0 },
             { name: 'Масло сливочное', cal: 748, prot: 0.5, fat: 82.5, carb: 0.8 },
@@ -504,44 +535,66 @@
             { name: 'Лук репчатый сырой', cal: 41, prot: 1.4, fat: 0.2, carb: 8.2 }
         ];
 
-        let customProducts = JSON.parse(localStorage.getItem('custom_products') || '[]');
+        let customProducts = [];
         let ingredientCount = 0;
         let activeIngredients = [];
-        let history = JSON.parse(localStorage.getItem('kbju_history') || '[]');
+        let history = [];
 
-        function sanitizeNumberInput(input) {
-            let value = input.value;
-            value = value.replace(/,/g, '.');
-            value = value.replace(/[^0-9.]/g, '');
-            const parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        function init() {
+            try {
+                customProducts = JSON.parse(localStorage.getItem('custom_products') || '[]');
+                history = JSON.parse(localStorage.getItem('kbju_history') || '[]');
+            } catch (e) {
+                console.error('Ошибка загрузки данных из localStorage:', e);
+                customProducts = [];
+                history = [];
             }
-            input.value = value;
+            
+            setupEventListeners();
+            addIngredient();
+            displayHistory();
         }
 
-        function getSortedProducts(query) {
-            const lowerQuery = query.toLowerCase();
+        // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
+        function setupEventListeners() {
+            document.getElementById('addIngredientBtn').addEventListener('click', addIngredient);
+            document.getElementById('calculateBtn').addEventListener('click', calculate);
+            document.getElementById('saveBtn').addEventListener('click', saveToHistory);
+            document.getElementById('newDishBtn').addEventListener('click', newDish);
+            document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
             
-            const localMatches = customProducts.filter(p => 
-                p.name && p.name.toLowerCase().startsWith(lowerQuery)
-            );
+            const dishNameInput = document.getElementById('dishName');
+            const dishNoteInput = document.getElementById('dishNote');
+            const finalWeightInput = document.getElementById('finalWeight');
             
-            const baseMatches = productDatabase.filter(p => 
-                p.name.toLowerCase().startsWith(lowerQuery)
-            );
+            dishNameInput.addEventListener('input', checkSaveButton);
+            dishNoteInput.addEventListener('input', checkSaveButton);
             
-            localMatches.sort((a, b) => {
-                const nameCompare = a.name.localeCompare(b.name, 'ru');
-                if (nameCompare !== 0) return nameCompare;
-                return customProducts.indexOf(b) - customProducts.indexOf(a);
+            // Специальная логика для поля веса: запятая и точка -> плюс
+            finalWeightInput.addEventListener('input', function(e) {
+                let value = e.target.value;
+                value = value.replace(/[,.]/g, '+');
+                value = value.replace(/[^0-9+]/g, '');
+                e.target.value = value;
+                checkCalculateButton();
             });
             
-            baseMatches.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+            finalWeightInput.addEventListener('wheel', function(e) {
+                e.target.blur();
+            });
             
-            return [...localMatches, ...baseMatches];
+            // Закрытие автокомплита при клике вне
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.autocomplete-wrapper')) {
+                    document.querySelectorAll('.autocomplete-list').forEach(list => {
+                        list.classList.remove('show');
+                    });
+                }
+            });
         }
 
+        // ========== РАБОТА С ИНГРЕДИЕНТАМИ ==========
         function addIngredient() {
             ingredientCount++;
             activeIngredients.push(ingredientCount);
@@ -553,12 +606,12 @@
             div.innerHTML = `
                 <div class="ingredient-header">
                     <span class="ingredient-number">Ингредиент ${activeIngredients.length}</span>
-                    ${!isFirst ? `<button class="remove-btn" onclick="removeIngredient(${ingredientCount})">✕</button>` : '<div style="width: 24px;"></div>'}
+                    ${!isFirst ? `<button class="btn-icon remove-ingredient" data-id="${ingredientCount}" aria-label="Удалить ингредиент">✕</button>` : '<div style="width: 24px;"></div>'}
                 </div>
                 <div class="autocomplete-wrapper">
                     <label>Название</label>
-                    <input type="text" id="name-${ingredientCount}" placeholder="Начните вводить..." oninput="showAutocomplete(${ingredientCount}); checkCalculateButton();" autocomplete="off">
-                    <div class="autocomplete-list" id="autocomplete-${ingredientCount}"></div>
+                    <input type="text" class="ingredient-name" data-id="${ingredientCount}" placeholder="Начните вводить..." autocomplete="off" aria-label="Название ингредиента" aria-autocomplete="list">
+                    <div class="autocomplete-list" id="autocomplete-${ingredientCount}" role="listbox" aria-label="Список продуктов"></div>
                 </div>
                 <div class="kbju-labels">
                     <label>Калории</label>
@@ -567,15 +620,53 @@
                     <label>Углев.</label>
                 </div>
                 <div class="kbju-grid">
-                    <input type="text" inputmode="decimal" step="0.1" min="0" id="cal-${ingredientCount}" placeholder="0" oninput="sanitizeNumberInput(this); checkCalculateButton()" onwheel="this.blur()">
-                    <input type="text" inputmode="decimal" step="0.1" min="0" id="prot-${ingredientCount}" placeholder="0" oninput="sanitizeNumberInput(this); checkCalculateButton()" onwheel="this.blur()">
-                    <input type="text" inputmode="decimal" step="0.1" min="0" id="fat-${ingredientCount}" placeholder="0" oninput="sanitizeNumberInput(this); checkCalculateButton()" onwheel="this.blur()">
-                    <input type="text" inputmode="decimal" step="0.1" min="0" id="carb-${ingredientCount}" placeholder="0" oninput="sanitizeNumberInput(this); checkCalculateButton()" onwheel="this.blur()">
+                    <input type="text" inputmode="decimal" step="0.1" min="0" class="ingredient-cal" data-id="${ingredientCount}" placeholder="0" aria-label="Калории">
+                    <input type="text" inputmode="decimal" step="0.1" min="0" class="ingredient-prot" data-id="${ingredientCount}" placeholder="0" aria-label="Белки">
+                    <input type="text" inputmode="decimal" step="0.1" min="0" class="ingredient-fat" data-id="${ingredientCount}" placeholder="0" aria-label="Жиры">
+                    <input type="text" inputmode="decimal" step="0.1" min="0" class="ingredient-carb" data-id="${ingredientCount}" placeholder="0" aria-label="Углеводы">
                 </div>
                 <label>Вес (г)</label>
-                <input type="text" inputmode="decimal" min="0" step="0.1" id="weight-${ingredientCount}" placeholder="Например: 500" oninput="sanitizeNumberInput(this); updateTotalWeight(); checkCalculateButton();" onwheel="this.blur()">
+                <input type="text" inputmode="decimal" min="0" step="0.1" class="ingredient-weight" data-id="${ingredientCount}" placeholder="Например: 500" aria-label="Вес ингредиента в граммах">
             `;
             container.appendChild(div);
+            
+            // Добавляем обработчики событий
+            const ingredientId = ingredientCount;
+            
+            if (!isFirst) {
+                div.querySelector('.remove-ingredient').addEventListener('click', function() {
+                    removeIngredient(ingredientId);
+                });
+            }
+            
+            const nameInput = div.querySelector('.ingredient-name');
+            const debouncedAutocomplete = debounce((id) => showAutocomplete(id), 200);
+            nameInput.addEventListener('input', function() {
+                debouncedAutocomplete(ingredientId);
+                checkCalculateButton();
+            });
+            
+            const kbjuInputs = div.querySelectorAll('.ingredient-cal, .ingredient-prot, .ingredient-fat, .ingredient-carb');
+            kbjuInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    sanitizeNumberInput(e.target);
+                    checkCalculateButton();
+                });
+                input.addEventListener('wheel', function(e) {
+                    e.target.blur();
+                });
+            });
+            
+            const weightInput = div.querySelector('.ingredient-weight');
+            weightInput.addEventListener('input', function(e) {
+                sanitizeNumberInput(e.target);
+                updateTotalWeight();
+                checkCalculateButton();
+            });
+            weightInput.addEventListener('wheel', function(e) {
+                e.target.blur();
+            });
+            
             checkCalculateButton();
         }
 
@@ -605,57 +696,43 @@
             });
         }
 
-        function updateTotalWeight() {
-            let total = 0;
-            activeIngredients.forEach(id => {
-                const weightEl = document.getElementById(`weight-${id}`);
-                if (weightEl) {
-                    const weight = parseFloat(weightEl.value) || 0;
-                    total += weight;
-                }
-            });
-            document.getElementById('finalWeight').value = total > 0 ? total : '';
+        // ========== САНИТИЗАЦИЯ ВВОДА ==========
+        function sanitizeNumberInput(input) {
+            let value = input.value;
+            value = value.replace(/,/g, '.');
+            value = value.replace(/[^0-9.]/g, '');
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            input.value = value;
         }
 
-        function checkCalculateButton() {
-            const btn = document.getElementById('calculateBtn');
-            let hasData = false;
-            let allValid = true;
+        // ========== АВТОКОМПЛИТ ==========
+        function getSortedProducts(query) {
+            const lowerQuery = query.toLowerCase();
             
-            for (let id of activeIngredients) {
-                const name = document.getElementById(`name-${id}`)?.value.trim() || '';
-                const weight = parseFloat(document.getElementById(`weight-${id}`)?.value) || 0;
-                const cal = document.getElementById(`cal-${id}`)?.value.trim();
-                const prot = document.getElementById(`prot-${id}`)?.value.trim();
-                const fat = document.getElementById(`fat-${id}`)?.value.trim();
-                const carb = document.getElementById(`carb-${id}`)?.value.trim();
-                
-                const allKBJUFilled = cal !== '' && prot !== '' && fat !== '' && carb !== '';
-                
-                if (weight > 0 && allKBJUFilled && name) {
-                    hasData = true;
-                }
-                
-                const hasAnyValue = name || weight > 0 || cal !== '' || prot !== '' || fat !== '' || carb !== '';
-                const hasAllValues = name && weight > 0 && allKBJUFilled;
-                
-                if (hasAnyValue && !hasAllValues) {
-                    allValid = false;
-                }
-            }
+            const localMatches = customProducts.filter(p => 
+                p.name && p.name.toLowerCase().startsWith(lowerQuery)
+            );
             
-            btn.disabled = !hasData || !allValid;
-            checkSaveButton();
-        }
-        
-        function checkSaveButton() {
-            const saveBtn = document.getElementById('saveBtn');
-            const dishName = document.getElementById('dishName')?.value.trim() || '';
-            saveBtn.disabled = !dishName;
+            const baseMatches = productDatabase.filter(p => 
+                p.name.toLowerCase().startsWith(lowerQuery)
+            );
+            
+            localMatches.sort((a, b) => {
+                const nameCompare = a.name.localeCompare(b.name, 'ru');
+                if (nameCompare !== 0) return nameCompare;
+                return customProducts.indexOf(b) - customProducts.indexOf(a);
+            });
+            
+            baseMatches.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+            
+            return [...localMatches, ...baseMatches];
         }
 
         function showAutocomplete(id) {
-            const input = document.getElementById(`name-${id}`);
+            const input = document.querySelector(`.ingredient-name[data-id="${id}"]`);
             const list = document.getElementById(`autocomplete-${id}`);
             const value = input.value;
 
@@ -671,8 +748,11 @@
                 return;
             }
 
-            list.innerHTML = matches.map(p => {
-                // Проверяем есть ли этот продукт в customProducts
+            // Очищаем список безопасно
+            list.innerHTML = '';
+            
+            // Создаём элементы без innerHTML
+            matches.forEach(p => {
                 const isCustom = customProducts.some(cp => 
                     cp.name === p.name && 
                     cp.cal === p.cal && 
@@ -681,39 +761,74 @@
                     cp.carb === p.carb
                 );
                 
-                const escapedName = p.name.replace(/'/g, "\\'");
-                const productData = `${p.cal},${p.prot},${p.fat},${p.carb}`;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'autocomplete-item';
+                itemDiv.setAttribute('data-id', id);
+                itemDiv.setAttribute('data-name', encodeURIComponent(p.name));
+                itemDiv.setAttribute('data-cal', p.cal);
+                itemDiv.setAttribute('data-prot', p.prot);
+                itemDiv.setAttribute('data-fat', p.fat);
+                itemDiv.setAttribute('data-carb', p.carb);
+                itemDiv.setAttribute('role', 'option');
                 
-                // Добавляем класс, если есть кнопка, чтобы добавить паддинг тексту
-                const itemClass = isCustom ? 'autocomplete-item has-delete' : 'autocomplete-item';
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'autocomplete-content';
+                contentDiv.textContent = p.name;
                 
-                const deleteBtn = isCustom ? 
-                    `<button class="autocomplete-delete" onclick="deleteCustomProduct(event, '${escapedName}', '${productData}')">✕</button>` : '';
+                itemDiv.appendChild(contentDiv);
                 
-                return `
-                    <div class="${itemClass}" onclick="selectProduct(${id}, '${escapedName}', ${p.cal}, ${p.prot}, ${p.fat}, ${p.carb})">
-                        <div class="autocomplete-content">${p.name}</div>
-                        ${deleteBtn}
-                    </div>
-                `;
-            }).join('');
+                if (isCustom) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'autocomplete-delete';
+                    deleteBtn.textContent = '✕';
+                    deleteBtn.setAttribute('aria-label', 'Удалить продукт');
+                    deleteBtn.setAttribute('data-name', encodeURIComponent(p.name));
+                    deleteBtn.setAttribute('data-cal', p.cal);
+                    deleteBtn.setAttribute('data-prot', p.prot);
+                    deleteBtn.setAttribute('data-fat', p.fat);
+                    deleteBtn.setAttribute('data-carb', p.carb);
+                    
+                    deleteBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const name = decodeURIComponent(this.dataset.name);
+                        const cal = parseFloat(this.dataset.cal);
+                        const prot = parseFloat(this.dataset.prot);
+                        const fat = parseFloat(this.dataset.fat);
+                        const carb = parseFloat(this.dataset.carb);
+                        deleteCustomProduct(name, cal, prot, fat, carb);
+                    });
+                    
+                    itemDiv.appendChild(deleteBtn);
+                }
+                
+                contentDiv.addEventListener('click', function() {
+                    const itemId = parseInt(itemDiv.dataset.id);
+                    const name = decodeURIComponent(itemDiv.dataset.name);
+                    const cal = parseFloat(itemDiv.dataset.cal);
+                    const prot = parseFloat(itemDiv.dataset.prot);
+                    const fat = parseFloat(itemDiv.dataset.fat);
+                    const carb = parseFloat(itemDiv.dataset.carb);
+                    selectProduct(itemId, name, cal, prot, fat, carb);
+                });
+                
+                list.appendChild(itemDiv);
+            });
+            
+            list.setAttribute('role', 'listbox');
             list.classList.add('show');
         }
 
         function selectProduct(id, name, cal, prot, fat, carb) {
-            document.getElementById(`name-${id}`).value = name;
-            document.getElementById(`cal-${id}`).value = cal;
-            document.getElementById(`prot-${id}`).value = prot;
-            document.getElementById(`fat-${id}`).value = fat;
-            document.getElementById(`carb-${id}`).value = carb;
+            document.querySelector(`.ingredient-name[data-id="${id}"]`).value = name;
+            document.querySelector(`.ingredient-cal[data-id="${id}"]`).value = cal;
+            document.querySelector(`.ingredient-prot[data-id="${id}"]`).value = prot;
+            document.querySelector(`.ingredient-fat[data-id="${id}"]`).value = fat;
+            document.querySelector(`.ingredient-carb[data-id="${id}"]`).value = carb;
             document.getElementById(`autocomplete-${id}`).classList.remove('show');
             checkCalculateButton();
         }
 
-        function deleteCustomProduct(event, name, productData) {
-            event.stopPropagation();
-            const [cal, prot, fat, carb] = productData.split(',').map(Number);
-            
+        function deleteCustomProduct(name, cal, prot, fat, carb) {
             const index = customProducts.findIndex(p => 
                 p.name === name && 
                 p.cal === cal && 
@@ -724,33 +839,97 @@
             
             if (index > -1) {
                 customProducts.splice(index, 1);
-                localStorage.setItem('custom_products', JSON.stringify(customProducts));
+                try {
+                    localStorage.setItem('custom_products', JSON.stringify(customProducts));
+                } catch (e) {
+                    console.error('Ошибка сохранения в localStorage:', e);
+                }
                 
-                // Обновляем все открытые списки
                 document.querySelectorAll('.autocomplete-list.show').forEach(list => {
-                    const inputId = list.id.replace('autocomplete-', '');
-                    showAutocomplete(parseInt(inputId));
+                    const inputId = parseInt(list.id.replace('autocomplete-', ''));
+                    showAutocomplete(inputId);
                 });
             }
         }
 
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.autocomplete-wrapper')) {
-                document.querySelectorAll('.autocomplete-list').forEach(list => {
-                    list.classList.remove('show');
-                });
-            }
-        });
+        // ========== РАСЧЁТ ВЕСА ==========
+        function updateTotalWeight() {
+            let total = 0;
+            activeIngredients.forEach(id => {
+                const weightEl = document.querySelector(`.ingredient-weight[data-id="${id}"]`);
+                if (weightEl) {
+                    const weight = parseFloat(weightEl.value) || 0;
+                    total += weight;
+                }
+            });
+            const finalWeightInput = document.getElementById('finalWeight');
+            finalWeightInput.placeholder = total > 0 ? total.toString() : '0';
+        }
 
+        function evaluateMathExpression(expr) {
+            try {
+                const sanitized = expr.replace(/[^0-9+.\s]/g, '');
+                const result = sanitized.split('+').reduce((sum, num) => {
+                    return sum + (parseFloat(num.trim()) || 0);
+                }, 0);
+                return result;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        // ========== ВАЛИДАЦИЯ ==========
+        function checkCalculateButton() {
+            const btn = document.getElementById('calculateBtn');
+            let hasData = false;
+            let allValid = true;
+            
+            for (let id of activeIngredients) {
+                const name = document.querySelector(`.ingredient-name[data-id="${id}"]`)?.value.trim() || '';
+                const weight = parseFloat(document.querySelector(`.ingredient-weight[data-id="${id}"]`)?.value) || 0;
+                const cal = document.querySelector(`.ingredient-cal[data-id="${id}"]`)?.value.trim();
+                const prot = document.querySelector(`.ingredient-prot[data-id="${id}"]`)?.value.trim();
+                const fat = document.querySelector(`.ingredient-fat[data-id="${id}"]`)?.value.trim();
+                const carb = document.querySelector(`.ingredient-carb[data-id="${id}"]`)?.value.trim();
+                
+                const allKBJUFilled = cal !== '' && prot !== '' && fat !== '' && carb !== '';
+                
+                if (weight > 0 && allKBJUFilled && name) {
+                    hasData = true;
+                }
+                
+                const hasAnyValue = name || weight > 0 || cal !== '' || prot !== '' || fat !== '' || carb !== '';
+                const hasAllValues = name && weight > 0 && allKBJUFilled;
+                
+                if (hasAnyValue && !hasAllValues) {
+                    allValid = false;
+                }
+            }
+            
+            // Проверяем, что в поле веса что-то введено
+            const finalWeightValue = document.getElementById('finalWeight').value.trim();
+            const hasFinalWeight = finalWeightValue !== '';
+            
+            btn.disabled = !hasData || !allValid || !hasFinalWeight;
+            checkSaveButton();
+        }
+        
+        function checkSaveButton() {
+            const saveBtn = document.getElementById('saveBtn');
+            const dishName = document.getElementById('dishName')?.value.trim() || '';
+            saveBtn.disabled = !dishName;
+        }
+
+        // ========== РАСЧЁТ КБЖУ ==========
         function getCurrentIngredients() {
             const ingredients = [];
             activeIngredients.forEach(id => {
-                const name = document.getElementById(`name-${id}`)?.value.trim() || '';
-                const weight = parseFloat(document.getElementById(`weight-${id}`)?.value) || 0;
-                const cal = parseFloat(document.getElementById(`cal-${id}`)?.value) || 0;
-                const prot = parseFloat(document.getElementById(`prot-${id}`)?.value) || 0;
-                const fat = parseFloat(document.getElementById(`fat-${id}`)?.value) || 0;
-                const carb = parseFloat(document.getElementById(`carb-${id}`)?.value) || 0;
+                const name = document.querySelector(`.ingredient-name[data-id="${id}"]`)?.value.trim() || '';
+                const weight = parseFloat(document.querySelector(`.ingredient-weight[data-id="${id}"]`)?.value) || 0;
+                const cal = parseFloat(document.querySelector(`.ingredient-cal[data-id="${id}"]`)?.value) || 0;
+                const prot = parseFloat(document.querySelector(`.ingredient-prot[data-id="${id}"]`)?.value) || 0;
+                const fat = parseFloat(document.querySelector(`.ingredient-fat[data-id="${id}"]`)?.value) || 0;
+                const carb = parseFloat(document.querySelector(`.ingredient-carb[data-id="${id}"]`)?.value) || 0;
                 
                 if (weight > 0) {
                     ingredients.push({ name, weight, cal, prot, fat, carb });
@@ -760,24 +939,32 @@
         }
 
         function calculate() {
-            const finalWeight = parseFloat(document.getElementById('finalWeight').value);
+            const finalWeightInput = document.getElementById('finalWeight');
+            let finalWeightValue = finalWeightInput.value.trim();
+            
+            // Вычисляем математическое выражение
+            const finalWeight = evaluateMathExpression(finalWeightValue);
+            
             if (!finalWeight || finalWeight <= 0) {
                 alert('Добавьте ингредиенты с весом');
                 return;
             }
+            
+            // Заменяем содержимое поля на результат вычисления
+            finalWeightInput.value = finalWeight.toString();
 
             let totalCal = 0, totalProt = 0, totalFat = 0, totalCarb = 0;
 
             activeIngredients.forEach(id => {
-                const nameEl = document.getElementById(`name-${id}`);
+                const nameEl = document.querySelector(`.ingredient-name[data-id="${id}"]`);
                 if (!nameEl) return;
 
                 const name = nameEl.value.trim();
-                const weight = parseFloat(document.getElementById(`weight-${id}`).value) || 0;
-                const cal = parseFloat(document.getElementById(`cal-${id}`).value) || 0;
-                const prot = parseFloat(document.getElementById(`prot-${id}`).value) || 0;
-                const fat = parseFloat(document.getElementById(`fat-${id}`).value) || 0;
-                const carb = parseFloat(document.getElementById(`carb-${id}`).value) || 0;
+                const weight = parseFloat(document.querySelector(`.ingredient-weight[data-id="${id}"]`).value) || 0;
+                const cal = parseFloat(document.querySelector(`.ingredient-cal[data-id="${id}"]`).value) || 0;
+                const prot = parseFloat(document.querySelector(`.ingredient-prot[data-id="${id}"]`).value) || 0;
+                const fat = parseFloat(document.querySelector(`.ingredient-fat[data-id="${id}"]`).value) || 0;
+                const carb = parseFloat(document.querySelector(`.ingredient-carb[data-id="${id}"]`).value) || 0;
 
                 if (weight > 0 && name) {
                     totalCal += (cal * weight) / 100;
@@ -803,7 +990,11 @@
                     
                     if (isDifferentFromBase && !alreadyExists) {
                         customProducts.push({ name, cal, prot, fat, carb });
-                        localStorage.setItem('custom_products', JSON.stringify(customProducts));
+                        try {
+                            localStorage.setItem('custom_products', JSON.stringify(customProducts));
+                        } catch (e) {
+                            console.error('Ошибка сохранения в localStorage:', e);
+                        }
                     }
                 }
             });
@@ -824,6 +1015,7 @@
             document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
+        // ========== ИСТОРИЯ ==========
         function saveToHistory() {
             const name = document.getElementById('dishName').value.trim();
             if (!name) {
@@ -852,7 +1044,12 @@
 
             history.unshift(dish);
             if (history.length > 50) history = history.slice(0, 50);
-            localStorage.setItem('kbju_history', JSON.stringify(history));
+            
+            try {
+                localStorage.setItem('kbju_history', JSON.stringify(history));
+            } catch (e) {
+                console.error('Ошибка сохранения истории:', e);
+            }
             
             displayHistory();
             
@@ -880,23 +1077,63 @@
 
             document.getElementById('historySection').style.display = 'block';
             const list = document.getElementById('historyList');
-            list.innerHTML = history.map((dish, index) => `
-                <div class="history-item">
-                    <div class="history-content" onclick="loadFromHistory(${index})">
-                        <div class="history-name">${dish.name}</div>
-                        <div class="history-kbju">${dish.cal} ккал · Б: ${dish.prot}г · Ж: ${dish.fat}г · У: ${dish.carb}г · ${dish.date}</div>
-                        ${dish.note ? `<div class="history-note">${dish.note}</div>` : ''}
-                    </div>
-                    <button class="history-delete" onclick="deleteHistoryItem(${index}, event)">✕</button>
-                </div>
-            `).join('');
+            
+            // Очищаем список безопасно
+            list.innerHTML = '';
+            
+            // Создаём элементы без innerHTML
+            history.forEach((dish, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item';
+                itemDiv.setAttribute('data-index', index);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'history-content';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'history-name';
+                nameDiv.textContent = dish.name;
+                
+                const kbjuDiv = document.createElement('div');
+                kbjuDiv.className = 'history-kbju';
+                kbjuDiv.textContent = `${dish.cal} ккал · Б: ${dish.prot}г · Ж: ${dish.fat}г · У: ${dish.carb}г · ${dish.date}`;
+                
+                contentDiv.appendChild(nameDiv);
+                contentDiv.appendChild(kbjuDiv);
+                
+                if (dish.note) {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'history-note';
+                    noteDiv.textContent = dish.note;
+                    contentDiv.appendChild(noteDiv);
+                }
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-icon history-delete';
+                deleteBtn.textContent = '✕';
+                deleteBtn.setAttribute('aria-label', 'Удалить блюдо');
+                deleteBtn.setAttribute('data-index', index);
+                
+                contentDiv.addEventListener('click', () => loadFromHistory(index));
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteHistoryItem(index);
+                });
+                
+                itemDiv.appendChild(contentDiv);
+                itemDiv.appendChild(deleteBtn);
+                list.appendChild(itemDiv);
+            });
         }
 
-        function deleteHistoryItem(index, event) {
-            event.stopPropagation();
+        function deleteHistoryItem(index) {
             if (confirm('Удалить это блюдо из истории?')) {
                 history.splice(index, 1);
-                localStorage.setItem('kbju_history', JSON.stringify(history));
+                try {
+                    localStorage.setItem('kbju_history', JSON.stringify(history));
+                } catch (e) {
+                    console.error('Ошибка сохранения истории:', e);
+                }
                 displayHistory();
             }
         }
@@ -912,12 +1149,12 @@
                 dish.ingredients.forEach(ing => {
                     addIngredient();
                     const currentId = ingredientCount;
-                    document.getElementById(`name-${currentId}`).value = ing.name || '';
-                    document.getElementById(`cal-${currentId}`).value = ing.cal || 0;
-                    document.getElementById(`prot-${currentId}`).value = ing.prot || 0;
-                    document.getElementById(`fat-${currentId}`).value = ing.fat || 0;
-                    document.getElementById(`carb-${currentId}`).value = ing.carb || 0;
-                    document.getElementById(`weight-${currentId}`).value = ing.weight || 0;
+                    document.querySelector(`.ingredient-name[data-id="${currentId}"]`).value = ing.name || '';
+                    document.querySelector(`.ingredient-cal[data-id="${currentId}"]`).value = ing.cal || 0;
+                    document.querySelector(`.ingredient-prot[data-id="${currentId}"]`).value = ing.prot || 0;
+                    document.querySelector(`.ingredient-fat[data-id="${currentId}"]`).value = ing.fat || 0;
+                    document.querySelector(`.ingredient-carb[data-id="${currentId}"]`).value = ing.carb || 0;
+                    document.querySelector(`.ingredient-weight[data-id="${currentId}"]`).value = ing.weight || 0;
                 });
             } else {
                 addIngredient();
@@ -943,14 +1180,31 @@
             if (confirm('Удалить всю историю и локальные продукты?')) {
                 history = [];
                 customProducts = [];
-                localStorage.removeItem('kbju_history');
-                localStorage.removeItem('custom_products');
+                try {
+                    localStorage.removeItem('kbju_history');
+                    localStorage.removeItem('custom_products');
+                } catch (e) {
+                    console.error('Ошибка очистки localStorage:', e);
+                }
                 displayHistory();
             }
         }
 
-        addIngredient();
-        displayHistory();
+        // ========== ЗАПУСК ==========
+        init();
+        
+        // Регистрация Service Worker для PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker зарегистрирован:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Ошибка регистрации Service Worker:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
