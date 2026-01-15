@@ -2,7 +2,7 @@
   "name": "Калькулятор КБЖУ",
   "short_name": "КБЖУ",
   "description": "Калькулятор калорий, белков, жиров и углеводов для готовых блюд",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#1a1a1a",
   "theme_color": "#1a1a1a",
