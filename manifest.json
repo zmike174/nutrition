@@ -1,6 +1,6 @@
 {
-  "name": "Калькулятор КБЖУ",
-  "short_name": "КБЖУ",
+  "name": "Nutrition",
+  "short_name": "Nutrition",
   "description": "Калькулятор калорий, белков, жиров и углеводов для готовых блюд",
   "start_url": "./",
   "display": "standalone",
