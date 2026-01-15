@@ -10,7 +10,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link rel="manifest" href="manifest.json">
-    <title>КБЖУ Калькулятор</title>
+    <title>Nutrition</title>
     <style>
         :root {
             --color-bg-primary: #1a1a1a;
@@ -461,8 +461,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Калькулятор КБЖУ</h1>
+    <div class="container" style="padding-top: 24px;">
         
         <div id="ingredients"></div>
         
@@ -1066,6 +1065,7 @@
             document.getElementById('dishName').value = '';
             document.getElementById('dishNote').value = '';
             addIngredient();
+            updateTotalWeight();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
